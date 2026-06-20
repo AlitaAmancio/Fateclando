@@ -86,20 +86,27 @@ def start_send_loop(connection, session_key, stop_event):
             break
 
 
+def _ask_port():
+    raw = input("Enter the server port [5002]: ").strip()
+    return int(raw) if raw else 5002
+
+
 def main():
     args = parse_args()
     my_name = (args.name or input("Enter your name: ")).strip()
     peer_name = (args.peer or input("Enter the server name: ")).strip()
+    server_ip = args.server if args.server != "127.0.0.1" else (input("Enter the server IP [127.0.0.1]: ").strip() or "127.0.0.1")
+    server_port = args.port if args.port != 5002 else _ask_port()
 
     my_private_key, peer_public_key = load_key_pair(my_name, peer_name)
 
     banner("Fateclando", f"Secure chat session as {my_name}")
 
     tcp_con = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    dest = (args.server, args.port)
+    dest = (server_ip, server_port)
 
     try:
-        status(f"Connecting to {args.server}:{args.port}...")
+        status(f"Connecting to {server_ip}:{server_port}...")
         tcp_con.connect(dest)
     except ConnectionRefusedError:
         error(f"Could not connect. Make sure {peer_name} (the server) is already running.")
