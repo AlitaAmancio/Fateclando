@@ -53,7 +53,11 @@ def peer_message(name, message):
 
 def your_message(message):
     with print_lock:
-        print(f"{now_stamp()} \033[1m{PASTEL_PINK}You: {message}{RESET}")
+        width = get_terminal_size((80, 20)).columns
+        stamp = f"[{datetime.now().strftime('%H:%M:%S')}]"
+        padding = max(0, width - len(stamp) - 1 - len(message))
+        print("\033[1A\033[2K", end="", flush=True)
+        print(f"{' ' * padding}{SOFT_GRAY}{stamp}{RESET} \033[1m{PASTEL_PINK}{message}{RESET}")
 
 
 def error(message):
